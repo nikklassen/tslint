@@ -120,4 +120,15 @@ module Lint {
         return (node.flags & flagToCheck) !== 0;
         /* tslint:enable:no-bitwise */
     }
+    
+    /**
+    * Checks if a file ends with ".tsx"
+    */
+    export function isTsxFile(fileName: string): boolean {
+        const extension = ".tsx";
+        const pathLen = fileName.length;
+        const extLen = extension.length;
+        return pathLen > extLen
+            && fileName.substr(pathLen - extLen, extLen) === extension;
+    }
 }

@@ -19,22 +19,20 @@ export class Rule extends Lint.Rules.AbstractRule {
     public static FAILURE_STRING_POSTFIX = "' used before declaration";
 
     public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
-        const documentRegistry = ts.createDocumentRegistry();
-        const languageServiceHost = Lint.createLanguageServiceHost("file.ts", sourceFile.getFullText());
-        const languageService = ts.createLanguageService(languageServiceHost, documentRegistry);
-
-        return this.applyWithWalker(new NoUseBeforeDeclareWalker(sourceFile, this.getOptions(), languageService));
+        return this.applyWithWalker(new NoUseBeforeDeclareWalker(sourceFile, this.getOptions()));
     }
 }
 
 type VisitedVariables = {[varName: string]: boolean};
 
 class NoUseBeforeDeclareWalker extends Lint.ScopeAwareRuleWalker<VisitedVariables> {
+    private fileName: string;
     private languageService: ts.LanguageService;
 
-    constructor(sourceFile: ts.SourceFile, options: Lint.IOptions, languageService: ts.LanguageService) {
+    constructor(sourceFile: ts.SourceFile, options: Lint.IOptions) {
         super(sourceFile, options);
-        this.languageService = languageService;
+        this.fileName = (Lint.isTsxFile(sourceFile.fileName) ? "file.tsx" : "file.ts");
+        this.languageService = Lint.createLanguageService(this.fileName, sourceFile.getFullText());
     }
 
     public createScope(): VisitedVariables {
@@ -101,7 +99,7 @@ class NoUseBeforeDeclareWalker extends Lint.ScopeAwareRuleWalker<VisitedVariable
     }
 
     private validateUsageForVariable(name: string, position: number) {
-        const highlights = this.languageService.getDocumentHighlights("file.ts", position, ["file.ts"]);
+        const highlights = this.languageService.getDocumentHighlights(this.fileName, position, [this.fileName]);
         for (let highlight of highlights) {
             for (let highlightSpan of highlight.highlightSpans) {
                 const referencePosition = highlightSpan.textSpan.start;

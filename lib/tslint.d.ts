@@ -116,6 +116,7 @@ declare module Lint {
 }
 declare module Lint {
     function createLanguageServiceHost(fileName: string, source: string): ts.LanguageServiceHost;
+    function createLanguageService(fileName: string, source: string): ts.LanguageService;
 }
 declare module Lint.Rules {
     class AbstractRule implements Lint.IRule {
@@ -185,6 +186,7 @@ declare module Lint {
     function isBlockScopedVariable(node: ts.VariableDeclaration | ts.VariableStatement): boolean;
     function isBlockScopedBindingElement(node: ts.BindingElement): boolean;
     function isNodeFlagSet(node: ts.Node, flagToCheck: ts.NodeFlags): boolean;
+    function isTsxFile(fileName: string): boolean;
 }
 declare module Lint {
     class BlockScopeAwareRuleWalker<T, U> extends ScopeAwareRuleWalker<T> {
